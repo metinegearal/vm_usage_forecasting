@@ -1,0 +1,7 @@
+{
+  "cpu_margin_percentage_points": 1.0,
+  "validation_residual_samples": 48,
+  "training_peak_threshold_pct": 9.668361517488389,
+  "vm_slot_reserve_fraction": 0.02,
+  "interpretation": "Illustrative workload planning levels, not physical host capacity or calibrated uncertainty bounds"
+}

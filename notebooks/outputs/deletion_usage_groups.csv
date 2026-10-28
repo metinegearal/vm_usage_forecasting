@@ -1,0 +1,9 @@
+timing_group,vm_count,mean_training_cpu,median_training_cpu,vm_category
+at maximum boundary,8213,9.308238189012014,5.732361075814574,All
+before maximum boundary,1787,9.900576356482611,3.9697902200615482,All
+at maximum boundary,5429,8.134073715332061,5.857838124140169,Delay-insensitive
+before maximum boundary,751,9.147825567506247,3.119376307164582,Delay-insensitive
+at maximum boundary,2781,11.6067441757292,5.550840617130882,Interactive
+before maximum boundary,310,10.593751532812025,6.162022568978674,Interactive
+at maximum boundary,3,3.439497705002925,3.1591003152654533,Unknown
+before maximum boundary,726,10.383264425159096,3.903183270371906,Unknown

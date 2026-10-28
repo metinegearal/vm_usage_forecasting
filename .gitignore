@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.pytest_cache/
+challenge_data/
+*.csv.gz
+df_merged.csv

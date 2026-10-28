@@ -1,0 +1,55 @@
+origin,group_id,vm_type,subscription_size,period,status,optimizer,warnings
+62,0,Delay-insensitive,1-3,12,converged,lbfgs,
+62,0,Delay-insensitive,1-3,24,converged,lbfgs,Too few observations to estimate starting parameters for seasonal ARMA. All parameters except for variances will be set to zeros.
+62,1,Delay-insensitive,4-20,12,converged,lbfgs,
+62,1,Delay-insensitive,4-20,24,converged,lbfgs,Too few observations to estimate starting parameters for seasonal ARMA. All parameters except for variances will be set to zeros.
+62,2,Delay-insensitive,>20,12,converged,lbfgs,Non-stationary starting seasonal autoregressive Using zeros as starting parameters.
+62,2,Delay-insensitive,>20,24,converged,lbfgs,Non-stationary starting autoregressive parameters found. Using zeros as starting parameters. | Too few observations to estimate starting parameters for seasonal ARMA. All parameters except for variances will be set to zeros.
+62,3,Interactive,1-3,12,converged,lbfgs,Non-stationary starting seasonal autoregressive Using zeros as starting parameters.
+62,3,Interactive,1-3,24,converged,lbfgs,Too few observations to estimate starting parameters for seasonal ARMA. All parameters except for variances will be set to zeros.
+62,4,Interactive,4-20,12,converged,lbfgs,
+62,4,Interactive,4-20,24,converged,lbfgs,Too few observations to estimate starting parameters for seasonal ARMA. All parameters except for variances will be set to zeros.
+62,5,Interactive,>20,12,converged,lbfgs,
+62,5,Interactive,>20,24,converged,lbfgs,Too few observations to estimate starting parameters for seasonal ARMA. All parameters except for variances will be set to zeros.
+62,6,Unknown,1-3,12,converged,lbfgs,
+62,6,Unknown,1-3,24,converged,lbfgs,Too few observations to estimate starting parameters for seasonal ARMA. All parameters except for variances will be set to zeros.
+62,7,Unknown,4-20,12,converged,lbfgs,
+62,7,Unknown,4-20,24,converged,lbfgs,Too few observations to estimate starting parameters for seasonal ARMA. All parameters except for variances will be set to zeros.
+62,8,Unknown,>20,12,converged,lbfgs,
+62,8,Unknown,>20,24,converged,lbfgs,Too few observations to estimate starting parameters for seasonal ARMA. All parameters except for variances will be set to zeros.
+86,0,Delay-insensitive,1-3,12,converged,lbfgs,
+86,0,Delay-insensitive,1-3,24,converged,lbfgs,
+86,1,Delay-insensitive,4-20,12,converged,lbfgs,
+86,1,Delay-insensitive,4-20,24,converged,lbfgs,
+86,2,Delay-insensitive,>20,12,converged,lbfgs,
+86,2,Delay-insensitive,>20,24,converged,lbfgs,
+86,3,Interactive,1-3,12,converged,lbfgs,
+86,3,Interactive,1-3,24,converged,lbfgs,Non-stationary starting seasonal autoregressive Using zeros as starting parameters.
+86,4,Interactive,4-20,12,converged,lbfgs,
+86,4,Interactive,4-20,24,converged,lbfgs,
+86,5,Interactive,>20,12,converged,lbfgs,
+86,5,Interactive,>20,24,converged,lbfgs,
+86,6,Unknown,1-3,12,converged,lbfgs,Non-stationary starting seasonal autoregressive Using zeros as starting parameters.
+86,6,Unknown,1-3,24,converged,lbfgs,Non-stationary starting seasonal autoregressive Using zeros as starting parameters.
+86,7,Unknown,4-20,12,converged,lbfgs,
+86,7,Unknown,4-20,24,converged,lbfgs,
+86,8,Unknown,>20,12,converged,lbfgs,
+86,8,Unknown,>20,24,converged,lbfgs,
+110,0,Delay-insensitive,1-3,12,converged,lbfgs,
+110,0,Delay-insensitive,1-3,24,converged,lbfgs,
+110,1,Delay-insensitive,4-20,12,converged,lbfgs,
+110,1,Delay-insensitive,4-20,24,converged,lbfgs,
+110,2,Delay-insensitive,>20,12,converged,lbfgs,
+110,2,Delay-insensitive,>20,24,converged,lbfgs,Non-stationary starting seasonal autoregressive Using zeros as starting parameters.
+110,3,Interactive,1-3,12,converged,lbfgs,
+110,3,Interactive,1-3,24,converged,lbfgs,
+110,4,Interactive,4-20,12,converged,lbfgs,
+110,4,Interactive,4-20,24,converged,lbfgs,
+110,5,Interactive,>20,12,converged,lbfgs,
+110,5,Interactive,>20,24,converged,lbfgs,
+110,6,Unknown,1-3,12,converged,lbfgs,
+110,6,Unknown,1-3,24,converged,lbfgs,
+110,7,Unknown,4-20,12,converged,lbfgs,
+110,7,Unknown,4-20,24,converged,lbfgs,
+110,8,Unknown,>20,12,converged,lbfgs,
+110,8,Unknown,>20,24,converged,lbfgs,

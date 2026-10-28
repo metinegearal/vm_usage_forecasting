@@ -1,0 +1,42 @@
+[
+  {
+    "notebook": "explore.ipynb",
+    "code_cells": 4,
+    "passed": true,
+    "seconds": 18.53,
+    "notebook_sha256": "3451dbc43cf788de7816bafbeedea127b44898da129dfd9de99951ead1ae90bd",
+    "bootstrap_verified_from_workspace_and_notebook_directory": true
+  },
+  {
+    "notebook": "transform.ipynb",
+    "code_cells": 6,
+    "passed": true,
+    "seconds": 6.82,
+    "notebook_sha256": "9132d5422e836ae2394d95162653fd88e6db125f11a6efadb3f3bbf3d598d229",
+    "bootstrap_verified_from_workspace_and_notebook_directory": true,
+    "deletion_analysis_verified": true,
+    "subscription_size_profiles_verified": true
+  },
+  {
+    "notebook": "train.ipynb",
+    "code_cells": 3,
+    "passed": true,
+    "seconds": 184.53,
+    "notebook_sha256": "e73648e0d60e5903ba9ea3973e6ad5da9769957b5b7f876c7e62ac220cabd07f",
+    "bootstrap_verified_from_workspace_and_notebook_directory": true
+  },
+  {
+    "notebook": "evaluate.ipynb",
+    "code_cells": 3,
+    "passed": true,
+    "seconds": 9.57,
+    "notebook_sha256": "ebf0584738254a6361111cbf0b2744db2cbd3cebbbf715f801af26ff108bca2e",
+    "cached_experiment_input_guard_verified": true,
+    "bootstrap_verified_from_workspace_and_notebook_directory": true
+  },
+  {
+    "optional_tree_reproduction": true,
+    "passed": true,
+    "recorded_metrics_matched": true
+  }
+]

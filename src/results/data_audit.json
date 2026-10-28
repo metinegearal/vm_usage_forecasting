@@ -1,0 +1,19 @@
+{
+  "source_reading_rows": 1340000,
+  "source_metadata_rows": 10000,
+  "reading_missing_cells": 0,
+  "metadata_missing_cells": 0,
+  "incoherent_interval_statistics_rows": 0,
+  "unrecognized_categories_mapped_to_unknown": 0,
+  "exact_target_duplicates_removed": 0,
+  "invalid_avg_cpu_rows_excluded": 0,
+  "unique_vms": 10000,
+  "grid_timestamps": 134,
+  "source_timestamps": 134,
+  "wholly_missing_source_timestamps": 0,
+  "wholly_missing_cpu_timestamps": 0,
+  "missing_vm_timestamp_readings": 0,
+  "cadence_seconds": 300,
+  "start_timestamp": 0,
+  "end_timestamp": 39900
+}

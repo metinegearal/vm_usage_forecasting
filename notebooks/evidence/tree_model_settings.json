@@ -1,0 +1,53 @@
+{
+  "train_steps": 110,
+  "horizon": 24,
+  "validation_origins": [
+    62,
+    86
+  ],
+  "last_validation_label_step": 109,
+  "selected_model": "SeasonalNaive12",
+  "validation_fleet_MAE": {
+    "GAM": 0.4204846288507571,
+    "GBM": 0.41176800374306016,
+    "Persistence": 0.21495760852879842,
+    "RandomForest": 0.4108675918333093,
+    "SeasonalNaive12": 0.19150691687800314,
+    "SeasonalNaive24": 0.2897404139548109
+  },
+  "model_parameters": {
+    "RandomForest": {
+      "n_estimators": 150,
+      "max_depth": 4,
+      "min_samples_leaf": 5,
+      "max_features": 0.8,
+      "random_state": 42,
+      "n_jobs": 1
+    },
+    "GBM": {
+      "n_estimators": 150,
+      "learning_rate": 0.03,
+      "max_depth": 2,
+      "min_samples_leaf": 5,
+      "loss": "squared_error",
+      "random_state": 42
+    },
+    "GAM": {
+      "n_knots": 3,
+      "degree": 3,
+      "ridge_alpha": 10.0
+    }
+  },
+  "training_cpu_sha256": "532b76671d276c46232a0082fe5633259937d2a90b9860c287064aff3d8de40f",
+  "source_sha256": "606df060eeb8ce7902194ea36f702e2b397123dc456400b1d239a16721767f99",
+  "forecast_sha256": {
+    "Persistence": "b40ab8f0cf2b7b80a1d1698a649b5d39db5c6c0f3cee9c6dd629c7afdd811f1b",
+    "SeasonalNaive12": "4fe570fccbd794d0c4c985ad56613012f0e8fa18f6db22431f30d389e291e5d6",
+    "SeasonalNaive24": "a2649dc79da667c7a41b8c171643e39e209fb5250bfdc25711cd2c5e3356ad2b",
+    "RandomForest": "afa9d57fe55f921bbc74096fb99bd5e9b8fd8d67430e541951eb4ec2067fe60a",
+    "GBM": "a6cb3cfd29fd937ee1f6a2c07eb1d79b65963a8fd26ad577b5761b322bb62c45",
+    "GAM": "7ad2ed96744e5ca984926781688fe428a30e06c2dc7768b0adeb4eb038ace6fa"
+  },
+  "status": "frozen_before_test_scoring",
+  "sarima_reference_used_for_selection": false
+}
