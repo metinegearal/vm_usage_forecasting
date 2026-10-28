@@ -15,7 +15,7 @@
   "last_forecast_timestamp": 39900,
   "fitted_models": 54,
   "fallbacks": 0,
-  "source_sha256": "3656c0ba098b6f9ece220588e9bac53466d2234c71d78ad50f08d517b050000f",
+  "source_sha256": "87329f65f3b935ab3f2619a3f56e3b1a9b3939ea100ca60ab405914940db2493",
   "prediction_sha256": "af18783618c8dc6d7b5ed1261560636bf19957a9683572cb22367b9496ac3bc6",
   "python": "3.13.7",
   "versions": {
@@ -43,10 +43,15 @@
   },
   "previous_clean_environment_source_sha256": "2542e3429d236f1ed3146b8cb1ea20ab156030d03e9a89e76707bc6e2b1aa934",
   "current_src_layout_checks": {
-    "behavioral_tests_passed": 14,
+    "behavioral_tests_passed": 15,
     "notebooks_executed": 4,
     "optional_tree_experiment_metrics_reproduced": true,
     "notebook_outputs_cleared": true,
     "raw_file_training_notebook_reproduced_submission": true
+  },
+  "reviewer_documentation_update": {
+    "raw_data_main_rerun_passed": true,
+    "predictions_unchanged": true,
+    "editing_templates_removed": true
   }
 }

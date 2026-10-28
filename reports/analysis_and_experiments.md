@@ -2,7 +2,7 @@
 
 ## Jump analysis
 
-The original exploration proposed absolute five-minute CPU changes above `median(abs(change)) + 2 * median(abs(abs(change) - median(abs(change))))`. We retained that rule, using only the first 110 observations. The resulting threshold is **0.2233 percentage points** and there are **18 flags**. The threshold is an exploratory heuristic, not an anomaly probability or a guaranteed capacity violation.
+Jump detection uses absolute five-minute CPU changes above `median(abs(change)) + 2 * median(abs(abs(change) - median(abs(change))))`. We retained that rule, using only the first 110 observations. The resulting threshold is **0.2233 percentage points** and there are **18 flags**. The threshold is an exploratory heuristic, not an anomaly probability or a guaranteed capacity violation.
 
 The largest absolute fleet change occurs at **1500 seconds (25 minutes)**: **+0.4368 pp**. Its largest group contributions are:
 
@@ -33,7 +33,7 @@ The model's three size buckets include the current VM: **1–3, 4–20, >20**. E
 
 ### Why sizes 1–3, 4–20 and >20?
 
-The [restored notebook graph](../notebooks/outputs/subscription_size_rationale.png) shows training CPU mean/median and workload-category counts over the original finer bins (1, 2, 3, 4–5, 6–10, 11–20, 21–50, 51–100, 100+). The [tables](../notebooks/outputs/organization_size_profiles.csv) include VM and distinct-organization counts.
+The [subscription-size graph](../notebooks/outputs/subscription_size_rationale.png) shows training CPU mean/median and workload-category counts over the finer bins (1, 2, 3, 4–5, 6–10, 11–20, 21–50, 51–100, 100+). The [tables](../notebooks/outputs/organization_size_profiles.csv) include VM and distinct-organization counts.
 
 The cutoff at 3 preserves the notebook's small-group definition, fewer than three other VMs. The cutoff at 20 pools the finer mid-size/large cohorts into a simple three-level design. It was an explicit grouping choice, not a demonstrated optimal breakpoint. On the supplied population the size buckets contain 2,779, 2,667 and 4,554 VMs respectively. Crossing with workload type gives nine interpretable groups and fewer fitted series than fine bins or individual subscriptions. Category mix and rare groups remain visible in the graph.
 
@@ -47,15 +47,15 @@ Resource interactions are not monotonic sizing laws. For example, the 2-core/32-
 
 ### Burst gap and lifetime
 
-Your proxy `abs(source P95 max - source mean) / sqrt(2)` is retained as a **descriptive source-statistic gap**, not a validated instability score. Delay-insensitive has the largest mean gap (20.4709), versus 17.1146 for Interactive and 16.0512 for Unknown, yet its mean within-training standard deviation is lower (2.7973 versus 3.2436 and 3.3092). The proxy and observed short-window variability are therefore not interchangeable.
+The statistic `abs(source P95 max - source mean) / sqrt(2)` is retained as a **descriptive source-statistic gap**, not a validated instability score. Delay-insensitive has the largest mean gap (20.4709), versus 17.1146 for Interactive and 16.0512 for Unknown, yet its mean within-training standard deviation is lower (2.7973 versus 3.2436 and 3.3092). The proxy and observed short-window variability are therefore not interchangeable.
 
 The Spearman correlation between training CPU mean and source deletion day is **0.0907**, a weak positive association. The source-average relationship is 0.0978. Many deletion times coincide with the maximum source boundary, and complete-trace sampling is selective, so these are not unbiased lifetime estimates or evidence that higher utilization causes longer retention. Source metadata CPU summaries/deletion times are descriptive only and never used by the forecasting code.
 
-[Cleaned metadata notebook](../notebooks/transform.ipynb), [sharing table](../notebooks/outputs/metadata_sharing.csv), [resource table](../notebooks/outputs/metadata_resources.csv), [lifetime associations](../notebooks/outputs/metadata_lifetime_associations.csv).
+[Metadata notebook](../notebooks/transform.ipynb), [sharing table](../notebooks/outputs/metadata_sharing.csv), [resource table](../notebooks/outputs/metadata_resources.csv), [lifetime associations](../notebooks/outputs/metadata_lifetime_associations.csv).
 
 ### Unknown category and earlier deletion: the specific finding
 
-The original notebook's Unknown-category pattern is now explicitly retained and reproduced:
+Recorded deletion timing differs substantially by category:
 
 | Category | VMs | Median recorded deletion day | Mean training CPU |
 | --- | ---: | ---: | ---: |
@@ -93,6 +93,6 @@ GAM is not a tree model. Random Forest used 150 trees, depth 4 and minimum leaf 
 
 Only **38/62 supervised time rows per group** were available in validation after a 24-step warmup; the final fit had **86**. Weakly stable short cycles, few samples, and compounding recursive corrections are plausible reasons for failure. These causes were not isolated in ablations. Increasing complexity or adding more categories is not guaranteed to help. These particular settings lost even to simple baselines and were excluded from main; they do not prove that all tree models fail on all VM workloads.
 
-Earlier row-level LightGBM attempts addressed a different objective. Some original notebook cells used CPU summaries produced with the unsafe `109 * 3600` cutoff, or different rollout/split definitions. Those attractive scores are not presented as leakage-safe, like-for-like results. Clean group-level RF/GBM results are the evidence used here. Aggregate and per-VM errors must not be mixed.
+Earlier row-level LightGBM attempts addressed a different objective. Feature availability and rollout definitions differed in those runs, so their scores are excluded from the like-for-like comparison. Clean group-level RF/GBM results are the evidence used here. Aggregate and per-VM errors must not be mixed.
 
 The optional [experiment code](../notebooks/tree_experiments.py) reproduces the group-level comparison using the extra notebook requirements. It is not imported by main. The evaluation notebook defaults to recorded evidence and offers an explicit optional rerun. All final-window comparisons remain retrospective because the public holdout was inspected during development.

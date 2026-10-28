@@ -86,13 +86,6 @@ def analyze(data,n,output):
         ('Temporal patterns and recurring behavior','See temporal_demand.png and fleet_autocorrelation in analysis_summary.json. Periods 12 and 24 mean one and two hours, not daily cycles. This short history cannot establish daily/weekly seasonality. Autocorrelation may reflect trend.'),
         ('Workload differences across meaningful VM segments','Nine slots combine three VM categories with subscription sizes 1-3, 4-20, >20. Sizes count VMs in supplied metadata, not all customer VMs. Unknown labels are retained. Resource buckets do not establish prices or exact capacity.'),
         ('Peak and low-demand periods',f'Training P10/P90 are {low:.4f}% / {high:.4f}%; largest absolute five-minute ramp {summary["max_absolute_ramp_pp"]:.4f} pp. Thresholds are descriptive workload levels, not physical capacity violations.')]
-    notes=''
-    for title,body in parts:
-        notes+=f'## {title}\n\n{body}\n\n**My interpretation / operational implication:**\n\n_Add your comments here._\n\n'
-    notes_path=output/'analysis_notes.md'
-    if not notes_path.exists():
-        previous=output/'analysis_findings.md'
-        notes_path.write_text(previous.read_text() if previous.exists() else notes)
     findings='\n\n'.join(f'## {title}\n\n{body}' for title,body in parts)+'\n'
     (output/'analysis_findings.md').write_text(findings)
     return summary

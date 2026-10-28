@@ -1,12 +1,10 @@
 # vm_usage_forecasting
 
-Azure VM workload analysis and forecasting.
+Five-minute VM workload forecasting and analysis using the Microsoft Azure Public Dataset V2 challenge release.
 
-This folder is the complete submission. It reads the **two original release files**; no merged CSV, notebook kernel, parent-project code or experiment folders are needed.
+## Installation
 
-## Install
-
-Python 3.11+ is recommended; the supplied run records its exact package versions in `src/results/run_manifest.json`.
+Python 3.11+ is supported; the recorded run uses Python 3.13. Exact runtime package versions are listed in `src/results/run_manifest.json`.
 
 ```bash
 cd vm_usage_forecasting
@@ -15,81 +13,79 @@ source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
 
-Place the release files in any directory:
+## Data
+
+Supply a directory containing:
 
 ```text
-/path/to/challenge_data/
+challenge_data/
   vm_cpu_readings.csv.gz
   vm_metadata.csv.gz
 ```
 
-Uncompressed `.csv` inputs work too. Raw data and virtual environments are intentionally excluded from this submission.
+Uncompressed `.csv` files are also accepted. Raw data is excluded from version control. Inputs are loaded directly; no merged intermediate dataset is required.
 
-## Generate predictions
-
-From inside this folder, run:
+## Run
 
 ```bash
 python main.py --data-dir /path/to/challenge_data
 ```
 
-Pass the directory containing the two raw files; it can be inside or outside the repository. This command writes `predictions.csv` and training-only analysis/validation under `src/results/`. The output defaults are relative to this submission folder, not the caller's working directory. An absolute path to `main.py` also works from another directory.
+The command writes `predictions.csv` and training-window analysis and validation results under `src/results/`. Default output paths are relative to the checkout; the command can also be invoked by an absolute path from another working directory.
 
-The required prediction file contains exactly:
+The official release uses 110 training observations and a 24-step, two-hour forecast. Training timestamps are 0–32700 seconds; predictions cover 33000–39900 seconds at 300-second intervals. The prediction file has exactly 24 rows and these columns:
 
 ```text
 timestamp,active_vm_count,aggregate_cpu_utilization
 ```
 
-On the official release it has 24 rows at timestamps **33000, 33300, ..., 39900**, in seconds. Training uses the first 110 observations, through 32700 seconds. Each step is five minutes; the 24-step forecast is two hours.
-
-To reproduce the retrospective holdout metrics and plots included with the report:
+To generate the retrospective holdout evaluation and plots:
 
 ```bash
 python main.py --data-dir /path/to/challenge_data --evaluate
 ```
 
-Observed holdout CPU is scored/plotted only after the submission and run manifest have been saved. `--evaluate` never changes model fitting or the forecast recipe.
+Predictions and their manifest are saved before holdout scoring. `--evaluate` does not change fitting or model selection.
 
-Optional paths and smoke-test controls:
+Optional output locations:
 
 ```bash
 python main.py --data-dir /path/to/challenge_data --output /tmp/predictions.csv --results-dir /tmp/workload_results
 ```
 
-`--skip-analysis` skips figures without changing forecasts. `--horizon` and `--train-steps` support internal smoke data; the official horizon remains 24. Training defaults to all grid observations except the final horizon, yielding 110/24 for the supplied release. There is no hard-coded VM count, timestamp origin, fixed prediction table or requirement that all nine groups are populated.
+`--skip-analysis` omits figures. `--horizon` and `--train-steps` support smaller verification datasets; the official horizon is 24. Training defaults to all grid observations except the final horizon. VM counts and the timestamp origin are read from the data.
 
-## Fixed forecasting recipe
+## Method
 
-1. Read usage readings and metadata directly; construct the full five-minute targets before splitting.
-2. Count distinct valid VM readings per timestamp. Average VM-level `avg_cpu` equally, in percent.
-3. Calculate each subscription's VM count from the supplied metadata. Combine `vm_category` with subscription-size bins **1–3, 4–20, >20**, creating nine group slots.
-4. Fit SARIMA `(1,0,1) × (2,1,0,12)` and `(1,0,1) × (2,1,0,24)` to each occupied group's training mean.
-5. Compute `forecast12 - linear(forecast12) + linear(forecast24)` and clip to `[0,100]`. The lines are fitted to model forecasts, not observed holdout values.
-6. Merge forecasts using the counts of valid represented VMs at the forecast origin. Predict VM count by persistence.
+The full five-minute targets are constructed before the chronological split. Active count is the number of distinct VMs with valid average CPU readings, including idle VMs. Aggregate CPU is their unweighted mean percentage.
 
-The original notebook did not save the SARIMA-12 fit definition. Its nonseasonal and seasonal component orders were explicitly assumed to match the saved SARIMA-24 specification, changing only the period. This assumption is preserved rather than silently claiming an exact reconstruction of a missing model.
+VMs are segmented by workload category and subscription size (1–3, 4–20, >20), producing nine group slots. Two SARIMA models with fixed orders `(1,0,1) × (2,1,0,12)` and `(1,0,1) × (2,1,0,24)` forecast each occupied group's mean. The combined forecast is:
 
-The recipe is fixed by candidate choice. Validation does **not** automatically select a different method. Persistence and seasonal-naive baselines, and both standalone SARIMA variants, are evaluated on the same expanding origins 62 and 86, each forecasting 24 points inside the 110-point training window.
+```text
+group_forecast = clip(forecast12 - linear(forecast12) + linear(forecast24), 0, 100)
+```
 
-## Missing data and small inputs
+The linear components are estimated from model forecasts. Group forecasts are merged using represented VM counts at the forecast origin. Active VM count uses persistence. Component orders and grouping boundaries are fixed design choices; they are not automatically optimized by validation.
 
-Exact duplicate target readings are collapsed; conflicting `(vm_id,timestamp)` values and duplicate metadata IDs raise errors. Invalid/missing average CPU is excluded from the mean and represented count, without interpolation. Complete timestamp gaps and missing whole-timestamp training CPU cause a clear error after saving the target/audit files. Missing metadata for an observed VM also raises an error.
+Expanding-window validation uses origins 62 and 86 with 24-step horizons, entirely inside the first 110 observations. Persistence, seasonal-naive-12/24 and standalone SARIMA variants use the same validation windows.
 
-Missing subscription IDs are treated as singletons. Missing/unrecognized workload categories use `Unknown`. Empty group slots receive zero weight. When a group has fewer than 60 training observations, constant data, an incomplete CPU history, or an unsuccessful fit, a logged seasonal-naive/last-valid fallback is used. Warnings and actual optimizer outcomes appear in `src/results/fit_status.csv`. The official-data run should be checked for fallback counts; convergence alone does not establish model adequacy.
+## Data handling
 
-## Contents and interpretation
+Exact duplicate target readings are collapsed; conflicting VM/timestamp values and duplicate metadata IDs raise errors. Invalid average CPU readings are excluded from the count and mean without interpolation. Whole-timestamp source gaps, missing whole-timestamp training CPU, and missing metadata for an observed VM raise explicit errors.
 
-- `src/workload/data.py`: raw loading, target construction, groups and submission checks.
-- `src/workload/model.py`: the fixed recipe and explicit numerical/small-data fallbacks.
-- `src/workload/evaluation.py`: temporal evaluation and a validation-derived capacity buffer.
-- `src/workload/analysis.py`: seven workload analyses and graphs.
-- `analysis/README.md`: cleaned notebook ideas, interpretation and discarded leakage-prone steps.
-- `reports/final_report.md`: findings, baseline comparison, limitations and recommendation.
-- `src/results/`: small generated tables, figures, audit, optimizer log and reproduction manifest.
-- `tests/`: data integrity, timestamp handling, leakage boundaries and standalone CLI checks.
+Missing subscription IDs are treated as singletons; missing or unrecognized workload categories use `Unknown`. Empty groups receive zero weight. Short, constant, incomplete or unsuccessful model fits use logged seasonal-naive/last-valid fallbacks. Audit details and optimizer outcomes are recorded in `src/results/data_audit.json` and `src/results/fit_status.csv`.
 
-`src/results/figures/groups_full_history.png` shows the nine groups from hour zero, with the training/holdout boundary and standalone SARIMA-12/24 forecasts. Reported fleet errors are not per-VM prediction errors. These forecasts do not infer exact physical core demand or host headroom from bucketed metadata.
+## Analysis and results
+
+- [Final report](reports/final_report.md): methodology, baseline comparisons, errors, operational recommendations and limitations.
+- [Supporting analysis](reports/analysis_and_experiments.md): jump attribution, metadata relationships, subscription-size rationale, deletion-risk future work and unsuccessful tree experiments.
+- [Notebooks](notebooks/README.md): exploration, metadata analysis, training and evaluation.
+- [Full group histories](src/results/figures/groups_full_history.png): nine observed group series and final forecasts.
+- [Forecast errors](src/results/figures/forecast_errors.png): validation and retrospective errors by forecast lead.
+
+The final-window CPU MAE is 0.0579 percentage points, versus persistence at 0.1468. Training-only validation is less favorable (0.2097 versus 0.2150), and the fixed combination does not outperform every comparator. Detailed results are provided in the report.
+
+The public holdout was inspected during development. Final-window results are retrospective and do not constitute an untouched model-selection test. Generalization requires evaluation on new chronological windows. Complete-trace sampling also limits conclusions about churn and lifetime distributions; equal-VM CPU percentages do not identify physical host capacity.
 
 ## Tests
 
@@ -97,28 +93,15 @@ Missing subscription IDs are treated as singletons. Missing/unrecognized workloa
 python -B -m unittest discover -s tests -v
 ```
 
-The tests include an arbitrary-working-directory CLI run using only two tiny raw files, a nonzero timestamp origin, missing/empty group cases, and changed holdout targets/metadata summaries.
+Tests cover raw-file loading, duplicate and missing-data policies, group boundaries, holdout independence, arbitrary working directories and renamed checkouts.
 
-## Evaluation provenance
-
-The public final 24 observations were inspected during iterative notebook/model exploration. Their final scores are therefore **retrospective**, not an untouched independent estimate of model-selection performance. Keeping the recipe fixed now and testing that runtime fitting is prefix-only does not undo that history. Training-only validation is reported alongside holdout results, including contrary evidence from alternatives; no claim is made that the chosen recipe wins validation.
-
-Dataset source: [Microsoft Azure Public Dataset V2](https://github.com/Azure/AzurePublicDataset/blob/master/AzurePublicDatasetV2.md). The challenge's curated complete-trace population limits conclusions about churn and generalization.
-
-## Cleaned notebooks
-
-The four runnable notebooks are in [notebooks](notebooks/README.md). They retain jump, metadata, forecasting and failed-experiment analysis. Install `requirements-notebooks.txt` only for notebook/optional tree reproduction.
-
-## Repository location and notebook data
-
-The checkout may be named `vm_usage_forecasting` or any other name. Main derives source/output paths from its own file location; no parent project is required.
-
-Notebook setup discovers the repository by its `main.py` and `src/workload/data.py` files. It works from the repository root, `notebooks/`, or a workspace containing exactly one matching checkout. For other launch locations, set `VM_PROJECT_ROOT` to the checkout path.
-
-Notebooks default to raw files in `challenge_data/` inside the checkout. To use an external data directory, set an absolute path before launching Jupyter:
+## Notebook configuration
 
 ```bash
+python -m pip install -r requirements-notebooks.txt
 export VM_DATA_DIR=/path/to/challenge_data
 ```
 
-`VM_PROJECT_ROOT` and `VM_DATA_DIR` configure locations; neither depends on the Git repository name. They are not needed by the main CLI, which takes `--data-dir` explicitly.
+Notebooks default to `challenge_data/` inside the checkout. Repository discovery uses the source structure and is independent of the checkout name. Set `VM_PROJECT_ROOT` when launching from an unrelated directory. Notebook-only dependencies, including the optional tree benchmark, are separate from the prediction requirements.
+
+Dataset source: [Microsoft Azure Public Dataset V2](https://github.com/Azure/AzurePublicDataset/blob/master/AzurePublicDatasetV2.md).

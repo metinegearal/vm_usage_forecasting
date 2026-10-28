@@ -4,39 +4,43 @@
     "code_cells": 4,
     "passed": true,
     "seconds": 18.53,
-    "notebook_sha256": "942e641b929b042275ae69e30d56822f3078a4a372a1f81bb1c3ce73ce08f477",
+    "notebook_sha256": "ee0662a7c55bd95bebd3d8373d79af1c1bb1da10db22858b90fc0854fe6a9d22",
     "bootstrap_verified_from_workspace_and_notebook_directory": true,
-    "folder_name_independent_bootstrap_verified": true
+    "folder_name_independent_bootstrap_verified": true,
+    "reviewer_facing_markdown_validated": true
   },
   {
     "notebook": "transform.ipynb",
     "code_cells": 6,
     "passed": true,
     "seconds": 6.82,
-    "notebook_sha256": "cd66a9466288543f2800896d5def98494b69d85b6ebe6b9566a7825907d28b33",
+    "notebook_sha256": "c7772a421c7c14e99ac6a7649a0451b1ac075fc63db752a3394860f3d7411df3",
     "bootstrap_verified_from_workspace_and_notebook_directory": true,
     "deletion_analysis_verified": true,
     "subscription_size_profiles_verified": true,
-    "folder_name_independent_bootstrap_verified": true
+    "folder_name_independent_bootstrap_verified": true,
+    "reviewer_facing_markdown_validated": true
   },
   {
     "notebook": "train.ipynb",
     "code_cells": 3,
     "passed": true,
     "seconds": 184.53,
-    "notebook_sha256": "d0850863b6fcb1e4e72ed616804e2c6fb72806ea0aac92a5af51d8bcc2b9d304",
+    "notebook_sha256": "f80235dc35ddcc5bc6cb7e02660a3ed61a88729a68d8e8e677fcfb30c7d4f4d9",
     "bootstrap_verified_from_workspace_and_notebook_directory": true,
-    "folder_name_independent_bootstrap_verified": true
+    "folder_name_independent_bootstrap_verified": true,
+    "reviewer_facing_markdown_validated": true
   },
   {
     "notebook": "evaluate.ipynb",
     "code_cells": 3,
     "passed": true,
     "seconds": 9.57,
-    "notebook_sha256": "ab72c0f001da426b4b226f25fa27016545da0fb9b8631531e03a8290578e4de2",
+    "notebook_sha256": "9fd53c3d15559c15b045794a544951e5babba7b53f52d4d7fd1edb07dac57e58",
     "cached_experiment_input_guard_verified": true,
     "bootstrap_verified_from_workspace_and_notebook_directory": true,
-    "folder_name_independent_bootstrap_verified": true
+    "folder_name_independent_bootstrap_verified": true,
+    "reviewer_facing_markdown_validated": true
   },
   {
     "optional_tree_reproduction": true,

@@ -1,9 +1,16 @@
-# Cleaned notebooks
+# Analysis notebooks
 
-Open in this order: `explore.ipynb`, `transform.ipynb`, `train.ipynb`, `evaluate.ipynb`. Each starts from raw files or explicit saved results; no merged CSV or shared kernel globals are needed. Set `VM_DATA_DIR` or edit the data-directory cell. Install optional notebook/experiment tools with `python -m pip install -r requirements-notebooks.txt`.
+Recommended execution order:
 
-Code cells have been cleaned and outputs cleared for delivery. Add explanations in the spaces after each analysis. Source notebooks remain in the working project; these are curated runnable versions. `train.ipynb` regenerates the submission and evaluation before `evaluate.ipynb` reads it.
+1. `explore.ipynb`: training-window workload analysis and jumps.
+2. `transform.ipynb`: metadata relationships and subscription-size segmentation.
+3. `train.ipynb`: reproduce predictions and evaluation from the raw release files.
+4. `evaluate.ipynb`: compare errors and inspect unsuccessful model benchmarks.
 
-`analysis_helpers.py` reproduces training-only jumps, exact group jump attribution, and descriptive metadata relationships. `tree_experiments.py` reproduces the optional RF/GBM/GAM comparison; it is not imported by main. `evidence/` retains the recorded experiment results/settings. Optional reruns save separately under `outputs/`, preserving that evidence.
+Install `requirements-notebooks.txt` for the interactive environment and optional tree-model reproduction. Code-cell outputs are cleared; generated figures and tables are retained under `outputs/` and `src/results/`.
 
-Setup is independent of the checkout name. Raw files default to `<checkout>/challenge_data`; set `VM_DATA_DIR` for an external dataset and `VM_PROJECT_ROOT` when launching from an unrelated directory. No original parent-project directory is needed.
+Raw files default to `<checkout>/challenge_data`. Set `VM_DATA_DIR` for an external data directory and `VM_PROJECT_ROOT` when launching from an unrelated directory. Repository discovery does not depend on the checkout name.
+
+`analysis_helpers.py` implements training-only jump attribution and descriptive metadata comparisons. `tree_experiments.py` contains the optional RF/GBM/GAM benchmark, isolated from the prediction entry point. `evidence/` contains recorded experiment settings and metrics; optional reruns write separately to `outputs/`.
+
+The training notebook regenerates the submission and evaluation files before the evaluation notebook reads them. Each notebook starts with explicit data/result paths and does not require variables from another notebook kernel.

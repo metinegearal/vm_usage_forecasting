@@ -6,7 +6,7 @@ The supplied release contains 10,000 VMs and 134 five-minute observations per VM
 
 The fixed CPU recipe achieves **MAE 0.0579 percentage points and RMSE 0.0676** on the public final window, versus persistence MAE 0.1468. However, training-only validation is less favorable: MAE 0.2097, only 2.45% below persistence, and worse than standalone SARIMA-24 and seasonal-naive-12. These distinctions matter more than the attractive final score.
 
-The public holdout was inspected during iterative notebook/model exploration. Its scores are **retrospective**, not an untouched estimate of model-selection performance. The final recipe is explicitly fixed by candidate choice; no automatic selection uses the final 24 values at runtime. This runtime separation does not undo earlier exposure.
+The public holdout was inspected during iterative notebook/model exploration. Its scores are **retrospective**, not an untouched estimate of model-selection performance. The model specification is fixed during execution. Runtime fitting uses training prefixes only; independent generalization requires new chronological data.
 
 ## 2. Data understanding and preprocessing
 
@@ -20,7 +20,7 @@ A valid target reading has a nonmissing VM ID and finite `avg_cpu` in [0,100]. A
 
 **Cadence and coverage.** All 10,000 traces cover all 110 training timestamps at 300-second cadence. Completeness is a selection condition of this release, not evidence that Azure generally has no missing telemetry or churn.
 
-**Missingness, duplicates and irregularities.** The release is clean for the target inputs, but the loader does not silently repair conflicting keys. The notebook cutoff `109 * 3600` was inappropriate for five-minute rows and could include future reading-derived summaries. The delivery uses positional chronological prefixes and omits those summary features entirely.
+**Missingness, duplicates and irregularities.** The release is clean for the target inputs, but the loader does not silently repair conflicting keys. Reading-derived summaries use positional chronological prefixes. Source lifetime CPU summaries are excluded from forecasting because their temporal availability is not guaranteed.
 
 **Lifetimes and churn.** Unknown VMs have median recorded deletion at 3.6354 days, versus 29.9931 days for the other categories. Records before the maximum deletion boundary have lower median training CPU (3.9698% versus 5.7324%) but higher mean (9.9006% versus 9.3082%); the low-usage interpretation depends on statistic and category. There are 0 internal arrivals and 0 departures. Metadata deletion times concentrate at the maximum for 8,213 VMs, suggesting a trace boundary/censoring effect. Creation at the trace boundary and last observation are not proof of real simultaneous provisioning/deletion. This sample cannot validate a churn model or an unbiased lifetime distribution.
 
@@ -31,7 +31,7 @@ A valid target reading has a nonmissing VM ID and finite `avg_cpu` in [0,100]. A
 **Temporal patterns.** Fleet autocorrelation is about 0.667 at five minutes, 0.367 at one hour and -0.026 at two hours. Periods 12 and 24 are short-cycle modeling hypotheses, not established daily/weekly seasons. Trends, transients and aggregation can create or hide apparent repetition. The largest absolute five-minute training ramp is 0.4368 percentage points.
 
 
-**Jump analysis.** The cleaned notebook retains the rule `abs(five-minute change) > median(abs(change)) + 2 × MAD(abs(change))`. On training data its threshold is 0.2233 pp, flagging 18 changes. The largest rise is 0.4368 pp at timestamp 1500 (25 minutes). Interactive / >20 and Delay-insensitive / >20 contribute 0.1402 and 0.1266 pp respectively. Group changes sum exactly to the fleet change, with no membership changes in this cohort. Adjacent flags can describe the rise and reversal of one event; their timing does not prove stable seasonality. See [jump plot](../notebooks/outputs/jumps.png) and [attribution](../notebooks/outputs/jump_attribution.csv).
+**Jump analysis.** Jump detection uses the rule `abs(five-minute change) > median(abs(change)) + 2 × MAD(abs(change))`. On training data its threshold is 0.2233 pp, flagging 18 changes. The largest rise is 0.4368 pp at timestamp 1500 (25 minutes). Interactive / >20 and Delay-insensitive / >20 contribute 0.1402 and 0.1266 pp respectively. Group changes sum exactly to the fleet change, with no membership changes in this cohort. Adjacent flags can describe the rise and reversal of one event; their timing does not prove stable seasonality. See [jump plot](../notebooks/outputs/jumps.png) and [attribution](../notebooks/outputs/jump_attribution.csv).
 
 **Meaningful segments.** Category populations are 6,180 Delay-insensitive, 3,091 Interactive and 729 Unknown. Each is split by inclusive subscription-size bins 1–3, 4–20 and >20. Sizes count VMs in the supplied metadata, not an organization's complete estate. Unknown labels remain visible. Workload categories do not establish price ratios or latency guarantees; open-ended resource buckets cannot yield exact physical capacity.
 
@@ -66,7 +66,7 @@ active_vm_count = last_training_active_vm_count
 
 This replaces both the level and slope from SARIMA-12 while retaining its detrended forecast shape. The lines use predicted future means, never observed holdout labels. SARIMA multi-step forecasts evolve their internal states without observing the final window. Static groups use supplied metadata; no calendar assumptions, metadata CPU summaries, deletion times or holdout-based CPU terciles enter forecasting.
 
-The SARIMA-12 fit definition was missing from the original saved notebook. Its orders were explicitly assumed to match the saved SARIMA-24 orders, changing only the period. That assumption is visible in the implementation and documentation; this is not claimed as an exact recovery of an unspecified model.
+Both seasonal models share fixed nonseasonal and seasonal component orders, differing only in period. These orders are not optimized independently by group or period; sensitivity to the specification remains a limitation.
 
 Group weights use valid VM counts at the forecast origin, and assume that represented composition persists. On the complete release these are fixed and reconstruct the equal-VM mean exactly. Sparse/incomplete segment histories use a logged last-valid/seasonal-naive fallback. Fewer than 60 training observations or a constant series also triggers a documented fallback, allowing small reviewer smoke datasets without pretending a complex seasonal model is identifiable. Failed numerical fits are logged and fall back explicitly. All 54 SARIMA fits in the official run converged without fallbacks; convergence alone does not prove adequate residuals.
 
@@ -81,7 +81,7 @@ Validation expands the training prefix and always forecasts 24 steps:
 
 Both forecast windows are entirely inside the first 110 observations and do not overlap. The same scheme evaluates persistence, seasonal-naive-12/24, standalone SARIMA-12/24 and the fixed combination. No random split is used. Two origins are a limited approximation to production's repeated two-hour forecasting, particularly with only 2.6 two-hour cycles at the first origin.
 
-The main command keeps the requested recipe fixed rather than replacing it with the validation winner. Earlier alternative-trend validation favored damped Holt (merged MAE 0.1491 versus 0.2097 for the SARIMA-24 trend), but that advantage reversed in the public final window (0.2140 versus 0.0579). This contrary evidence is retained; neither method has established universal superiority. Alternative implementations are omitted from the delivery because the fixed production recipe does not need them.
+The forecasting recipe is fixed; validation reports its performance against alternatives rather than selecting a replacement. Earlier alternative-trend validation favored damped Holt (merged MAE 0.1491 versus 0.2097 for the SARIMA-24 trend), but that advantage reversed in the public final window (0.2140 versus 0.0579). This contrary evidence is retained; neither method has established universal superiority. Alternative implementations are omitted from the delivery because the fixed production recipe does not need them.
 
 ## 6. Results versus baseline
 
@@ -129,11 +129,11 @@ The one-point floor flags all 24 final slots for review. That exposes its conser
 
 ## 9. Limitations, reproduction and next steps
 
-The important limitations are public-holdout exposure during experimentation, only two validation origins, sparse evidence for stable seasonality, the assumed SARIMA-12 orders, a curated fixed roster, and weak identifiability of exact capacity from bucketed metadata. Future work should evaluate new chronological windows first, reassess whether seasonal-naive is sufficient, and test group-specific shifts and host-level headroom prospectively.
+The important limitations are public-holdout exposure during experimentation, only two validation origins, sparse evidence for stable seasonality, fixed seasonal component orders, a curated fixed roster, and weak identifiability of exact capacity from bucketed metadata. Future work should evaluate new chronological windows first, reassess whether seasonal-naive is sufficient, and test group-specific shifts and host-level headroom prospectively.
 
 A further research direction is **usage-informed VM deletion-risk prediction**: estimate next-day deletion probability or remaining lifetime from category, age and prefix-only CPU/idle/variability/trend features. Compare against category/age-only baselines and check effects within categories; Interactive shows nearly no CPU/deletion rank association and Unknown shows a negative one. Longer histories, verified event-versus-censoring labels and chronological time-to-event validation are needed. This short, complete-trace sample does not demonstrate that capability; source lifetime CPU summaries and actual deletion timestamps must not become predictors. See the [detailed finding and proposed study](analysis_and_experiments.md#future-work-usage-informed-deletion-risk-forecasting).
 
-The delivery contains the selected prediction path, four cleaned notebooks, compact analysis, tests, this report and generated results. Stale cells and the large merged CSV are not required. The optional tree-experiment helper is isolated from main and needs only the extra notebook dependencies. From a clean environment:
+The delivery contains the selected prediction path, four analysis notebooks, compact analysis, tests, this report and generated results. The optional tree-experiment helper is isolated from main and needs only the extra notebook dependencies. From a clean environment:
 
 ```bash
 python -m pip install -r requirements.txt
@@ -141,6 +141,6 @@ python main.py --data-dir /path/to/challenge_data --evaluate
 python -B -m unittest discover -s tests -v
 ```
 
-A fresh virtual environment installed only the declared requirements. An isolated copy, run from an unrelated directory, reproduced the official raw-data predictions in about 161 seconds on the test machine. Fourteen behavioral tests passed, including duplicate handling, inclusive bucket edges, changed holdout targets/source metadata summaries, empty groups, nonzero timestamps and a raw-file-only CLI run. `src/results/run_manifest.json` records source/prediction hashes, exact dependency versions, training bounds and all forecast timestamps.
+A fresh virtual environment installed only the declared requirements. An isolated copy, run from an unrelated directory, reproduced the official raw-data predictions in about 161 seconds on the test machine. Fifteen behavioral tests passed, including duplicate handling, inclusive bucket edges, changed holdout targets/source metadata summaries, empty groups, nonzero timestamps and a raw-file-only CLI run. `src/results/run_manifest.json` records source/prediction hashes, exact dependency versions, training bounds and all forecast timestamps.
 
-Sources: [Azure Public Dataset V2 documentation](https://github.com/Azure/AzurePublicDataset/blob/master/AzurePublicDatasetV2.md), the supplied challenge data card/assignment/submission contract, and [statsmodels SARIMAX](https://www.statsmodels.org/stable/generated/statsmodels.tsa.statespace.sarimax.SARIMAX.html). Detailed notebook corrections are in [the analysis guide](../analysis/README.md).
+Sources: [Azure Public Dataset V2 documentation](https://github.com/Azure/AzurePublicDataset/blob/master/AzurePublicDatasetV2.md), the supplied challenge data card/assignment/submission contract, and [statsmodels SARIMAX](https://www.statsmodels.org/stable/generated/statsmodels.tsa.statespace.sarimax.SARIMAX.html). Notebook organization and analytical scope are documented in [the analysis guide](../analysis/README.md).
