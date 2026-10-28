@@ -1,4 +1,6 @@
-# Azure VM workload forecasting
+# vm_usage_forecasting
+
+Azure VM workload analysis and forecasting.
 
 This folder is the complete submission. It reads the **two original release files**; no merged CSV, notebook kernel, parent-project code or experiment folders are needed.
 
@@ -7,7 +9,7 @@ This folder is the complete submission. It reads the **two original release file
 Python 3.11+ is recommended; the supplied run records its exact package versions in `src/results/run_manifest.json`.
 
 ```bash
-cd deliver_ready
+cd vm_usage_forecasting
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
@@ -31,7 +33,7 @@ From inside this folder, run:
 python main.py --data-dir /path/to/challenge_data
 ```
 
-For the supplied checkout, the data argument is `../forecasting-challenge/challenge_data`. This command writes `predictions.csv` and training-only analysis/validation under `src/results/`. The output defaults are relative to this submission folder, not the caller's working directory. An absolute path to `main.py` also works from another directory.
+Pass the directory containing the two raw files; it can be inside or outside the repository. This command writes `predictions.csv` and training-only analysis/validation under `src/results/`. The output defaults are relative to this submission folder, not the caller's working directory. An absolute path to `main.py` also works from another directory.
 
 The required prediction file contains exactly:
 
@@ -106,3 +108,17 @@ Dataset source: [Microsoft Azure Public Dataset V2](https://github.com/Azure/Azu
 ## Cleaned notebooks
 
 The four runnable notebooks are in [notebooks](notebooks/README.md). They retain jump, metadata, forecasting and failed-experiment analysis. Install `requirements-notebooks.txt` only for notebook/optional tree reproduction.
+
+## Repository location and notebook data
+
+The checkout may be named `vm_usage_forecasting` or any other name. Main derives source/output paths from its own file location; no parent project is required.
+
+Notebook setup discovers the repository by its `main.py` and `src/workload/data.py` files. It works from the repository root, `notebooks/`, or a workspace containing exactly one matching checkout. For other launch locations, set `VM_PROJECT_ROOT` to the checkout path.
+
+Notebooks default to raw files in `challenge_data/` inside the checkout. To use an external data directory, set an absolute path before launching Jupyter:
+
+```bash
+export VM_DATA_DIR=/path/to/challenge_data
+```
+
+`VM_PROJECT_ROOT` and `VM_DATA_DIR` configure locations; neither depends on the Git repository name. They are not needed by the main CLI, which takes `--data-dir` explicitly.

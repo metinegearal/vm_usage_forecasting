@@ -2,6 +2,7 @@
 from pathlib import Path
 import os
 import subprocess
+import shutil
 import sys
 import tempfile
 import unittest
@@ -127,6 +128,22 @@ class PipelineTests(unittest.TestCase):
         single_fleet,_,counts,_=forecast(single,7,24)
         self.assertEqual(int((counts>0).sum()),1)
         self.assertTrue(np.isfinite(single_fleet['SARIMA12_24Trend']).all())
+
+    def test_renamed_checkout_uses_its_own_default_paths(self):
+        r,m=fixture(32)
+        with tempfile.TemporaryDirectory() as tmp:
+            workspace=Path(tmp); clone=workspace/'vm_usage_forecasting'; clone.mkdir()
+            shutil.copy2(ROOT/'main.py',clone/'main.py')
+            shutil.copytree(ROOT/'src/workload',clone/'src/workload',ignore=shutil.ignore_patterns('__pycache__','*.pyc'))
+            raw=clone/'challenge_data'; raw.mkdir()
+            r.to_csv(raw/'vm_cpu_readings.csv',index=False);m.to_csv(raw/'vm_metadata.csv',index=False)
+            env=os.environ.copy();env.pop('PYTHONPATH',None);env['PYTHONDONTWRITEBYTECODE']='1'
+            result=subprocess.run([sys.executable,'-B',str(clone/'main.py'),'--data-dir',str(raw),'--skip-analysis'],
+                cwd=workspace,env=env,capture_output=True,text=True,timeout=60)
+            self.assertEqual(result.returncode,0,result.stdout+result.stderr)
+            prediction=pd.read_csv(clone/'predictions.csv')
+            self.assertEqual(len(prediction),24)
+            self.assertTrue((clone/'src/results/run_manifest.json').is_file())
 
     def test_main_from_arbitrary_directory_with_only_raw_files(self):
         r,m=fixture(32)

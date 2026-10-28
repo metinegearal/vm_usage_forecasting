@@ -1,0 +1,88 @@
+{
+  "tested_checkout_name": "vm_usage_forecasting",
+  "notebook_checks": [
+    {
+      "notebook": "train.ipynb",
+      "launch": "repo_root",
+      "passed": true
+    },
+    {
+      "notebook": "train.ipynb",
+      "launch": "notebook_directory",
+      "passed": true
+    },
+    {
+      "notebook": "train.ipynb",
+      "launch": "parent_workspace",
+      "passed": true
+    },
+    {
+      "notebook": "evaluate.ipynb",
+      "launch": "repo_root",
+      "passed": true
+    },
+    {
+      "notebook": "evaluate.ipynb",
+      "launch": "notebook_directory",
+      "passed": true
+    },
+    {
+      "notebook": "evaluate.ipynb",
+      "launch": "parent_workspace",
+      "passed": true
+    },
+    {
+      "notebook": "transform.ipynb",
+      "launch": "repo_root",
+      "passed": true
+    },
+    {
+      "notebook": "transform.ipynb",
+      "launch": "notebook_directory",
+      "passed": true
+    },
+    {
+      "notebook": "transform.ipynb",
+      "launch": "parent_workspace",
+      "passed": true
+    },
+    {
+      "notebook": "explore.ipynb",
+      "launch": "repo_root",
+      "passed": true
+    },
+    {
+      "notebook": "explore.ipynb",
+      "launch": "notebook_directory",
+      "passed": true
+    },
+    {
+      "notebook": "explore.ipynb",
+      "launch": "parent_workspace",
+      "passed": true
+    },
+    {
+      "notebook": "train.ipynb",
+      "launch": "unrelated_directory_with_configuration",
+      "passed": true
+    },
+    {
+      "notebook": "evaluate.ipynb",
+      "launch": "unrelated_directory_with_configuration",
+      "passed": true
+    },
+    {
+      "notebook": "transform.ipynb",
+      "launch": "unrelated_directory_with_configuration",
+      "passed": true
+    },
+    {
+      "notebook": "explore.ipynb",
+      "launch": "unrelated_directory_with_configuration",
+      "passed": true
+    }
+  ],
+  "behavioral_tests_passed": 15,
+  "renamed_checkout_cli_passed": true,
+  "external_parent_project_required": false
+}
